@@ -1,0 +1,8 @@
+version: v2
+plugins:
+  - local: protoc-gen-es
+    out: src/proto/generated
+    opt:
+      - target=ts
+inputs:
+  - directory: schema/protobuf/sync_pb

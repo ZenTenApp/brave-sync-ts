@@ -1,0 +1,65 @@
+{
+  "name": "brave-sync-ts",
+  "version": "0.1.0",
+  "description": "TypeScript library for Brave Sync - access passwords, bookmarks, and Authenticator.cc 2FA entries",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "bin": {
+    "brave-sync": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:proto": "buf generate",
+    "dev": "tsc -w -p tsconfig.build.json",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "lint": "eslint src/",
+    "cli": "tsx src/cli.ts",
+    "prepare": "npm run build:proto && npm run build",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "brave",
+    "sync",
+    "password",
+    "bookmark",
+    "authenticator",
+    "2fa",
+    "totp",
+    "chromium",
+    "nigori",
+    "encryption"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@bufbuild/protobuf": "^2.0.0",
+    "@noble/ciphers": "^1.3.0",
+    "@noble/ed25519": "^2.2.0",
+    "@noble/hashes": "^2.0.0",
+    "@scure/bip39": "^2.0.0",
+    "fflate": "^0.8.0"
+  },
+  "devDependencies": {
+    "@bufbuild/buf": "^1.47.0",
+    "@bufbuild/protoc-gen-es": "^2.0.0",
+    "@types/node": "^22.0.0",
+    "commander": "^13.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
