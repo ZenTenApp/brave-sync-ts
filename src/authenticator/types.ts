@@ -28,6 +28,13 @@ export interface ReadAuthenticatorResult {
   entries: OTPEntry[];
   /** Number of entries that failed to decrypt */
   decryptionFailures: number;
+  /**
+   * Whether any extensionSetting entity in the sync payload carried the
+   * Authenticator.cc extension ID, regardless of whether its value parsed
+   * as an OTPStorage entry. True means at least one device in the sync
+   * chain has the extension installed. Always false when `success` is false.
+   */
+  extensionPresent: boolean;
   /** Error message if the operation failed */
   error?: string;
 }

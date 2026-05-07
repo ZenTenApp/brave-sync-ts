@@ -467,6 +467,7 @@ export async function readAuthenticatorEntries(options: ReadSyncOptions): Promis
         success: false,
         entries: [],
         decryptionFailures: 0,
+        extensionPresent: false,
         error: "No Nigori settings found. Is the sync chain initialized?",
       };
     }
@@ -479,6 +480,7 @@ export async function readAuthenticatorEntries(options: ReadSyncOptions): Promis
       success: false,
       entries: [],
       decryptionFailures: 0,
+      extensionPresent: false,
       error: error instanceof Error ? error.message : String(error),
     };
   }

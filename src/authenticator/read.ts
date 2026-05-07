@@ -70,11 +70,13 @@ export async function fetchAuthenticatorEntries(
         success: true,
         entries: [],
         decryptionFailures: 0,
+        extensionPresent: false,
       };
     }
 
     const entries: OTPEntry[] = [];
     let decryptionFailures = 0;
+    let extensionPresent = false;
 
     for (const entity of response.getUpdates.entries) {
       if (entity.deleted) {
@@ -87,6 +89,9 @@ export async function fetchAuthenticatorEntries(
       }
 
       try {
+        let extensionId: string | undefined;
+        let settingValue: string | undefined;
+
         // When encrypt_everything is true, the EntitySpecifics is Nigori-encrypted
         if (specifics.encrypted?.blob) {
           const ciphertext = Uint8Array.from(
@@ -98,21 +103,27 @@ export async function fetchAuthenticatorEntries(
 
           if (decryptedSpecifics.specificsVariant?.case === "extensionSetting") {
             const extSetting = decryptedSpecifics.specificsVariant.value;
-            const otpEntry = tryParseOtpEntry(extSetting.extensionId, extSetting.value);
-            if (otpEntry) {
-              entries.push(otpEntry);
-            }
+            extensionId = extSetting.extensionId;
+            settingValue = extSetting.value;
           }
+        } else if (specifics.specificsVariant?.case === "extensionSetting") {
+          // Unencrypted extension setting
+          const extSetting = specifics.specificsVariant.value;
+          extensionId = extSetting.extensionId;
+          settingValue = extSetting.value;
+        }
+
+        if (extensionId === undefined || settingValue === undefined) {
           continue;
         }
 
-        // Unencrypted extension setting
-        if (specifics.specificsVariant?.case === "extensionSetting") {
-          const extSetting = specifics.specificsVariant.value;
-          const otpEntry = tryParseOtpEntry(extSetting.extensionId, extSetting.value);
-          if (otpEntry) {
-            entries.push(otpEntry);
-          }
+        if (extensionId === BRAVE_SYNC_CONSTANTS.AUTHENTICATOR_EXTENSION_ID) {
+          extensionPresent = true;
+        }
+
+        const otpEntry = tryParseOtpEntry(extensionId, settingValue);
+        if (otpEntry) {
+          entries.push(otpEntry);
         }
       } catch {
         decryptionFailures++;
@@ -123,12 +134,14 @@ export async function fetchAuthenticatorEntries(
       success: true,
       entries,
       decryptionFailures,
+      extensionPresent,
     };
   } catch (error) {
     return {
       success: false,
       entries: [],
       decryptionFailures: 0,
+      extensionPresent: false,
       error: error instanceof Error ? error.message : String(error),
     };
   }
