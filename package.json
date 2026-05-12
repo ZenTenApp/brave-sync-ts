@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "build:proto": "buf generate",
+    "build:proto": "npx buf generate",
     "dev": "tsc -w -p tsconfig.build.json",
     "test": "vitest",
     "test:run": "vitest run",
