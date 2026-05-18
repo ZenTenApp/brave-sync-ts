@@ -14,6 +14,32 @@ npm run build:proto
 npm run build
 ```
 
+## Local development and testing
+
+### Test in another project with `npm pack`
+
+Use this to verify the published package layout (`dist/` only) before releasing, or to try the library from a separate app.
+
+1. Build and create a tarball from the repo root:
+
+```bash
+npm pack
+```
+
+This writes `brave-sync-ts-<version>.tgz` (for example `brave-sync-ts-0.1.0.tgz`).
+
+2. Install it in your consuming project:
+
+```bash
+npm install /absolute/or/relative/path/to/brave-sync-ts-0.1.0.tgz
+```
+
+3. Import as usual:
+
+```typescript
+import { BraveSyncClient } from "brave-sync-ts";
+```
+
 ## CLI Usage
 
 All commands accept `--seed "word1 word2 ... word25"` or `--seed env` to read from the `BRAVE_SYNC_SEED` environment variable.
@@ -44,10 +70,10 @@ npx tsx src/cli.ts delete-password --seed env --id <entity-id>
 ## Library Usage
 
 ```typescript
-import { BraveSyncClient } from 'brave-sync-ts';
+import { BraveSyncClient } from "brave-sync-ts";
 
 const client = new BraveSyncClient({
-  seedPhrase: 'word1 word2 ... word25',
+  seedPhrase: "word1 word2 ... word25",
 });
 
 await client.connect();
@@ -63,20 +89,24 @@ const otpEntries = await client.readAuthenticatorEntries();
 
 // Push a password
 await client.pushPassword({
-  url: 'https://example.com',
-  username: 'user@example.com',
-  password: 'secret',
+  url: "https://example.com",
+  username: "user@example.com",
+  password: "secret",
 });
 ```
 
 Standalone functions are also available:
 
 ```typescript
-import { readPasswords, readBookmarks, readAuthenticatorEntries } from 'brave-sync-ts';
+import {
+  readPasswords,
+  readBookmarks,
+  readAuthenticatorEntries,
+} from "brave-sync-ts";
 
-const passwords = await readPasswords({ seedPhrase: '...' });
-const bookmarks = await readBookmarks({ seedPhrase: '...' });
-const authenticator = await readAuthenticatorEntries({ seedPhrase: '...' });
+const passwords = await readPasswords({ seedPhrase: "..." });
+const bookmarks = await readBookmarks({ seedPhrase: "..." });
+const authenticator = await readAuthenticatorEntries({ seedPhrase: "..." });
 ```
 
 ## Architecture
