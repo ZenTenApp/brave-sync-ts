@@ -9,4 +9,6 @@ export {
   type SyncClientOptions,
 } from "./client.js";
 
+export type { NetworkAdapter } from "./adapter.js";
+
 export { initializeNigori, createNigoriSyncEntity, createEncryptionKeybag } from "./nigori-init.js";

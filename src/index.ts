@@ -83,6 +83,7 @@ export {
   createNigoriSyncEntity,
   createEncryptionKeybag,
   type SyncClientOptions,
+  type NetworkAdapter,
 } from "./sync/index.js";
 
 // Import for main function
@@ -107,7 +108,7 @@ import {
 
 // Re-export PasswordNote type
 export type { PasswordNote } from "./password/index.js";
-import { fetchNigoriSettings, commitEntities, initializeNigori, type SyncClientOptions } from "./sync/index.js";
+import { fetchNigoriSettings, commitEntities, initializeNigori, type SyncClientOptions, type NetworkAdapter } from "./sync/index.js";
 import { fetchBookmarks, type ReadBookmarksResult } from "./bookmark/index.js";
 import { fetchAuthenticatorEntries, type ReadAuthenticatorResult } from "./authenticator/index.js";
 
@@ -121,12 +122,14 @@ export interface ReadSyncOptions {
   serverUrl?: string;
   /** Brave service key (defaults to production key) */
   serviceKey?: string;
+  /** Optional network adapter for DNS/HTTP fallback (e.g. React Native) */
+  networkAdapter?: NetworkAdapter;
 }
 
 /**
  * Options for reading passwords from Brave Sync.
  */
-export interface ReadPasswordsOptions extends ReadSyncOptions {}
+export interface ReadPasswordsOptions extends ReadSyncOptions { }
 
 /**
  * Options for updating a password in Brave Sync.
@@ -149,6 +152,8 @@ export interface UpdatePasswordOptions {
   serverUrl?: string;
   /** Brave service key (defaults to production key) */
   serviceKey?: string;
+  /** Optional network adapter for DNS/HTTP fallback (e.g. React Native) */
+  networkAdapter?: NetworkAdapter;
 }
 
 /**
@@ -168,6 +173,8 @@ export interface DeletePasswordOptions {
   serverUrl?: string;
   /** Brave service key (defaults to production key) */
   serviceKey?: string;
+  /** Optional network adapter for DNS/HTTP fallback (e.g. React Native) */
+  networkAdapter?: NetworkAdapter;
 }
 
 /**
@@ -214,6 +221,7 @@ export async function pushPassword(options: PushPasswordOptions): Promise<PushPa
     note,
     serverUrl = BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL,
     serviceKey = BRAVE_SYNC_CONSTANTS.SERVICE_KEY,
+    networkAdapter,
   } = options;
 
   try {
@@ -233,6 +241,7 @@ export async function pushPassword(options: PushPasswordOptions): Promise<PushPa
       serviceKey,
       clientId,
       authToken,
+      networkAdapter,
     };
 
     // Step 5: Fetch Nigori settings; if the chain is uninitialised, create the
@@ -305,6 +314,7 @@ export async function readPasswords(options: ReadPasswordsOptions): Promise<Read
     seedPhrase,
     serverUrl = BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL,
     serviceKey = BRAVE_SYNC_CONSTANTS.SERVICE_KEY,
+    networkAdapter,
   } = options;
 
   try {
@@ -324,6 +334,7 @@ export async function readPasswords(options: ReadPasswordsOptions): Promise<Read
       serviceKey,
       clientId,
       authToken,
+      networkAdapter,
     };
 
     // Step 5: Fetch Nigori settings to get encryption keys
@@ -379,6 +390,7 @@ export async function readBookmarks(options: ReadSyncOptions): Promise<ReadBookm
     seedPhrase,
     serverUrl = BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL,
     serviceKey = BRAVE_SYNC_CONSTANTS.SERVICE_KEY,
+    networkAdapter,
   } = options;
 
   try {
@@ -392,6 +404,7 @@ export async function readBookmarks(options: ReadSyncOptions): Promise<ReadBookm
       serviceKey,
       clientId,
       authToken,
+      networkAdapter,
     };
 
     const nigoriSettings = await fetchNigoriSettings(syncOptions);
@@ -445,6 +458,7 @@ export async function readAuthenticatorEntries(options: ReadSyncOptions): Promis
     seedPhrase,
     serverUrl = BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL,
     serviceKey = BRAVE_SYNC_CONSTANTS.SERVICE_KEY,
+    networkAdapter,
   } = options;
 
   try {
@@ -458,6 +472,7 @@ export async function readAuthenticatorEntries(options: ReadSyncOptions): Promis
       serviceKey,
       clientId,
       authToken,
+      networkAdapter,
     };
 
     const nigoriSettings = await fetchNigoriSettings(syncOptions);
@@ -519,6 +534,7 @@ export async function updatePassword(options: UpdatePasswordOptions): Promise<Mo
     note,
     serverUrl = BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL,
     serviceKey = BRAVE_SYNC_CONSTANTS.SERVICE_KEY,
+    networkAdapter,
   } = options;
 
   // Validate: must provide either id OR (url + username)
@@ -546,6 +562,7 @@ export async function updatePassword(options: UpdatePasswordOptions): Promise<Mo
       serviceKey,
       clientId,
       authToken,
+      networkAdapter,
     };
 
     // Step 5: Fetch Nigori settings to get encryption keys
@@ -656,6 +673,7 @@ export async function deletePassword(options: DeletePasswordOptions): Promise<Mo
     id,
     serverUrl = BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL,
     serviceKey = BRAVE_SYNC_CONSTANTS.SERVICE_KEY,
+    networkAdapter,
   } = options;
 
   // Validate: must provide either id OR (url + username)
@@ -683,6 +701,7 @@ export async function deletePassword(options: DeletePasswordOptions): Promise<Mo
       serviceKey,
       clientId,
       authToken,
+      networkAdapter,
     };
 
     // Step 5: Fetch Nigori settings to decrypt passwords

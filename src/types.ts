@@ -2,6 +2,7 @@
  * TypeScript type definitions for Brave Sync library.
  */
 
+import type { NetworkAdapter } from './sync/adapter.js';
 import type { PasswordNote } from './password/index.js';
 
 /**
@@ -22,6 +23,8 @@ export interface PushPasswordOptions {
   serverUrl?: string;
   /** Brave service key (defaults to production key) */
   serviceKey?: string;
+  /** Optional network adapter for DNS/HTTP fallback (e.g. React Native) */
+  networkAdapter?: NetworkAdapter;
 }
 
 /**
