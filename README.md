@@ -8,11 +8,17 @@ TypeScript library for interacting with Brave browser sync. Given a 25-word BIP3
 
 ## Installation
 
+### Developing this library
+
 ```bash
 npm install
 npm run build:proto
 npm run build
 ```
+
+### Using in other ZenTenApp projects
+
+Private consumers install from Git over SSH with a **semver tag** (prebuilt `dist/` on the tag). See [Distribution and release](docs/DISTRIBUTION_AND_RELEASE.md) for semantic-release, consumer `package.json` pins, and `ignore-scripts` setup.
 
 ## Local development and testing
 
