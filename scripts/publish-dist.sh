@@ -6,10 +6,18 @@ set -euo pipefail
 git config user.name "github-actions[bot]"
 git config user.email "github-actions[bot]@users.noreply.github.com"
 
+START_SHA="$(git rev-parse HEAD)"
 SHORT_SHA="$(git rev-parse --short HEAD)"
 
 cp -r dist /tmp/brave-sync-dist
 cp package.json /tmp/brave-sync-package.json
+
+# npm version may leave package-lock.json dirty; stash so checkout dist succeeds.
+DIRTY_STASH=0
+if ! git diff --quiet || ! git diff --cached --quiet; then
+  git stash push -m "publish-dist"
+  DIRTY_STASH=1
+fi
 
 git fetch origin dist:dist 2>/dev/null || true
 
@@ -35,5 +43,8 @@ else
   echo "committed=true" >>"$GITHUB_OUTPUT"
 fi
 
-git fetch origin main
-git checkout -B main origin/main
+# Return to the commit we started on (semantic-release release commit), not origin/main.
+git checkout -B main "${START_SHA}"
+if [[ "${DIRTY_STASH}" == 1 ]]; then
+  git stash pop || true
+fi

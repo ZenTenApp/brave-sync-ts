@@ -25,6 +25,4 @@ gh release create "${TAG}" \
   --title "Release ${TAG}" \
   --generate-notes
 
-git checkout -f main
-
 echo "Released ${TAG} at dist ${DIST_SHA} — pin: github:ZenTenApp/brave-sync-ts#${TAG}"
