@@ -34,3 +34,6 @@ else
   git push origin dist
   echo "committed=true" >>"$GITHUB_OUTPUT"
 fi
+
+git fetch origin main
+git checkout -B main origin/main
