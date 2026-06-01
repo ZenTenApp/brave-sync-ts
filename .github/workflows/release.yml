@@ -25,18 +25,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: npm
 
       - run: npm ci
       - run: npm run build:proto
       - run: npm run build
 
-      # Keep dist branch current on every main push (even when semantic-release skips).
-      - name: Publish to dist branch
-        env:
-          GITHUB_OUTPUT: /tmp/publish-dist-output
-        run: bash scripts/publish-dist.sh
-
+      # Must run on main (full tree + .releaserc.json). publish-dist checks out dist only.
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
+
+      # When semantic-release skips, publish dist. When it releases, publishCmd already ran;
+      # this syncs dist to latest main (including chore(release) commits).
+      - name: Publish to dist branch
+        run: |
+          git fetch origin main
+          git checkout -B main origin/main
+          npm run build:proto && npm run build
+          bash scripts/publish-dist.sh
