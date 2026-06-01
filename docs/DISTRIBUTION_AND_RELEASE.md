@@ -34,13 +34,13 @@ Config: `[.releaserc.json](../.releaserc.json)` (same plugin style as vault-clea
   - `feat:` → minor
   - `feat!:` or `BREAKING CHANGE:` in body → major
 2. **Release** workflow runs on push:
-  - Builds and tests
-  - Always updates the `**dist`** branch (`[scripts/publish-dist.sh](../scripts/publish-dist.sh)`)
-  - **semantic-release** decides whether to cut a release:
+  - Builds on `main`, then runs **semantic-release** on `main` (before `publish-dist.sh`, which checks out `dist` only)
+  - If a release is warranted:
     - Updates `CHANGELOG.md` and `package.json` on `main`
     - Rebuilds (`prepareCmd` in `.releaserc.json`)
-    - Publishes `dist` again and creates **GitHub Release** `vX.Y.Z` targeting `**origin/dist`** (`[scripts/semantic-release-publish-dist.sh](../scripts/semantic-release-publish-dist.sh)`)
+    - Publishes `dist` and creates **GitHub Release** `vX.Y.Z` on `origin/dist` (`scripts/semantic-release-publish-dist.sh`)
     - Pushes `chore(release): X.Y.Z [skip ci]` to `main`
+  - Finally syncs `main` and updates the **`dist`** branch (`scripts/publish-dist.sh`)
 3. Consumers bump `#vX.Y.Z`.
 
 If commits since the last release are only `chore:` / `docs:` / `ci:`, semantic-release **skips** a new version; `dist` still updates for latest `main`.
