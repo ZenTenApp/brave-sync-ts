@@ -45,6 +45,8 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm run build:proto
+      - run: npm run build
 
       # Keep dist branch current on every main push (even when semantic-release skips).
       - name: Publish to dist branch
