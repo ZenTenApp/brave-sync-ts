@@ -10,35 +10,37 @@
 
 `main` is source-only. No `prepare` script — use `ignore-scripts=true` in consumers.
 
-Versioning matches [**zenten-vault-cleanup**](../zenten-vault-cleanup): [**semantic-release**](https://semantic-release.gitbook.io/) with conventional commits (uses **semver** rules internally). There is no Release Please and no custom validation script.
+Previously, a bare `github:ZenTenApp/brave-sync-ts` dependency cloned `main`, which has no committed `dist/`, so npm had to run `prepare` (proto + TypeScript build) on every install. That forced consumers to turn off `ignore-scripts`, added install-time supply-chain risk, and gave no stable version to pin in `package.json` or lockfiles. Releases fix that: CI builds once, commits artifacts to `dist`, and tags `vX.Y.Z` so installs are reproducible, script-free, and safe to consume with `ignore-scripts=true`.
 
 ---
 
 ## Workflows
 
-| Workflow | File | When |
-| -------- | ---- | ---- |
-| CI | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | PRs and pushes to `main` — build + test |
-| Release | [`.github/workflows/release.yml`](../.github/workflows/release.yml) | Push to `main` — publish `dist`, then `npx semantic-release` |
 
-Config: [`.releaserc.json`](../.releaserc.json) (same plugin style as vault-cleanup, without binary assets).
+| Workflow | File                                                                | When                                                         |
+| -------- | ------------------------------------------------------------------- | ------------------------------------------------------------ |
+| CI       | `[.github/workflows/ci.yml](../.github/workflows/ci.yml)`           | PRs and pushes to `main` — build + test                      |
+| Release  | `[.github/workflows/release.yml](../.github/workflows/release.yml)` | Push to `main` — publish `dist`, then `npx semantic-release` |
+
+
+Config: `[.releaserc.json](../.releaserc.json)` (same plugin style as vault-cleanup, without binary assets).
 
 ---
 
 ## How a release happens
 
 1. Land commits on `main` using [Conventional Commits](https://www.conventionalcommits.org/):
-   - `fix:` → patch
-   - `feat:` → minor
-   - `feat!:` or `BREAKING CHANGE:` in body → major
+  - `fix:` → patch
+  - `feat:` → minor
+  - `feat!:` or `BREAKING CHANGE:` in body → major
 2. **Release** workflow runs on push:
-   - Builds and tests
-   - Always updates the **`dist`** branch ([`scripts/publish-dist.sh`](../scripts/publish-dist.sh))
-   - **semantic-release** decides whether to cut a release:
-     - Updates `CHANGELOG.md` and `package.json` on `main`
-     - Rebuilds (`prepareCmd` in `.releaserc.json`)
-     - Publishes `dist` again and creates **GitHub Release** `vX.Y.Z` targeting **`origin/dist`** ([`scripts/semantic-release-publish-dist.sh`](../scripts/semantic-release-publish-dist.sh))
-     - Pushes `chore(release): X.Y.Z [skip ci]` to `main`
+  - Builds and tests
+  - Always updates the `**dist`** branch (`[scripts/publish-dist.sh](../scripts/publish-dist.sh)`)
+  - **semantic-release** decides whether to cut a release:
+    - Updates `CHANGELOG.md` and `package.json` on `main`
+    - Rebuilds (`prepareCmd` in `.releaserc.json`)
+    - Publishes `dist` again and creates **GitHub Release** `vX.Y.Z` targeting `**origin/dist`** (`[scripts/semantic-release-publish-dist.sh](../scripts/semantic-release-publish-dist.sh)`)
+    - Pushes `chore(release): X.Y.Z [skip ci]` to `main`
 3. Consumers bump `#vX.Y.Z`.
 
 If commits since the last release are only `chore:` / `docs:` / `ci:`, semantic-release **skips** a new version; `dist` still updates for latest `main`.
@@ -82,4 +84,5 @@ Dry-run release tooling (optional): `npm run release -- --dry-run` with a clean 
 
 1. **Pinning `main`** — no guaranteed `dist/`; pin semver tags only.
 2. **Non-conventional commits** — no automatic release until a `feat:` / `fix:` / breaking commit lands.
-3. **`chore(release)` pushes** — use `[skip ci]` in the release commit message; CI may still run on that push but semantic-release should not release again.
+3. `**chore(release)` pushes** — use `[skip ci]` in the release commit message; CI may still run on that push but semantic-release should not release again.
+
