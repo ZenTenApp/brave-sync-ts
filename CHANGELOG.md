@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/ZenTenApp/brave-sync-ts/compare/v1.0.0...v1.0.1) (2026-06-02)
+
+
+### Bug Fixes
+
+* re-release with simplified release workflow ([d68b4bd](https://github.com/ZenTenApp/brave-sync-ts/commit/d68b4bda6afa0bb5433d03bc4043775e692baec5))
+
 # 1.0.0 (2026-06-02)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "brave-sync-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript library for Brave Sync - access passwords, bookmarks, and Authenticator.cc 2FA entries",
   "type": "module",
   "main": "./dist/index.js",
