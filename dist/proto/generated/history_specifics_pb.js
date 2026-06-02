@@ -1,0 +1,32 @@
+// Copyright 2022 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+//
+// Sync protocol datatype extension for history entries.
+import { fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
+import { file_sync_enums } from "./sync_enums_pb";
+/**
+ * Describes the file history_specifics.proto.
+ */
+export const file_history_specifics = /*@__PURE__*/ fileDesc("ChdoaXN0b3J5X3NwZWNpZmljcy5wcm90bxIHc3luY19wYiKBCgoQSGlzdG9yeVNwZWNpZmljcxInCh92aXNpdF90aW1lX3dpbmRvd3NfZXBvY2hfbWljcm9zGAEgASgDEh0KFW9yaWdpbmF0b3JfY2FjaGVfZ3VpZBgCIAEoCRJBChByZWRpcmVjdF9lbnRyaWVzGAMgAygLMicuc3luY19wYi5IaXN0b3J5U3BlY2lmaWNzLlJlZGlyZWN0RW50cnkSJwofcmVkaXJlY3RfY2hhaW5fc3RhcnRfaW5jb21wbGV0ZRgTIAEoCBIlCh1yZWRpcmVjdF9jaGFpbl9lbmRfaW5jb21wbGV0ZRgUIAEoCBIlCh1yZWRpcmVjdF9jaGFpbl9taWRkbGVfdHJpbW1lZBgVIAEoCBJBCg9wYWdlX3RyYW5zaXRpb24YBCABKAsyKC5zeW5jX3BiLkhpc3RvcnlTcGVjaWZpY3MuUGFnZVRyYW5zaXRpb24SJQodb3JpZ2luYXRvcl9yZWZlcnJpbmdfdmlzaXRfaWQYBSABKAMSIgoab3JpZ2luYXRvcl9vcGVuZXJfdmlzaXRfaWQYBiABKAMSHQoVb3JpZ2luYXRvcl9jbHVzdGVyX2lkGBYgASgDEh0KFXZpc2l0X2R1cmF0aW9uX21pY3JvcxgHIAEoAxI0Cgxicm93c2VyX3R5cGUYCCABKA4yHi5zeW5jX3BiLlN5bmNFbnVtcy5Ccm93c2VyVHlwZRIRCgl3aW5kb3dfaWQYCSABKAUSDgoGdGFiX2lkGAogASgFEg8KB3Rhc2tfaWQYCyABKAMSFAoMcm9vdF90YXNrX2lkGAwgASgDEhYKDnBhcmVudF90YXNrX2lkGA0gASgDEhoKEmh0dHBfcmVzcG9uc2VfY29kZRgOIAEoBRIVCg1wYWdlX2xhbmd1YWdlGA8gASgJEjgKDnBhc3N3b3JkX3N0YXRlGBAgASgOMiAuc3luY19wYi5TeW5jRW51bXMuUGFzc3dvcmRTdGF0ZRITCgtmYXZpY29uX3VybBgRIAEoCRIUCgxyZWZlcnJlcl91cmwYEiABKAkSGwoTaGFzX3VybF9rZXllZF9pbWFnZRgXIAEoCBI2CgpjYXRlZ29yaWVzGBggAygLMiIuc3luY19wYi5IaXN0b3J5U3BlY2lmaWNzLkNhdGVnb3J5EhgKEHJlbGF0ZWRfc2VhcmNoZXMYGSADKAkSDgoGYXBwX2lkGBogASgJGp4BCg1SZWRpcmVjdEVudHJ5EhsKE29yaWdpbmF0b3JfdmlzaXRfaWQYASABKAMSCwoDdXJsGAIgASgJEg0KBXRpdGxlGAMgASgJEg4KBmhpZGRlbhgEIAEoCBJECg1yZWRpcmVjdF90eXBlGAUgASgOMi0uc3luY19wYi5TeW5jRW51bXMuUGFnZVRyYW5zaXRpb25SZWRpcmVjdFR5cGUapgEKDlBhZ2VUcmFuc2l0aW9uEkAKD2NvcmVfdHJhbnNpdGlvbhgBIAEoDjIhLnN5bmNfcGIuU3luY0VudW1zLlBhZ2VUcmFuc2l0aW9uOgRMSU5LEg8KB2Jsb2NrZWQYAiABKAgSFAoMZm9yd2FyZF9iYWNrGAMgASgIEhgKEGZyb21fYWRkcmVzc19iYXIYBCABKAgSEQoJaG9tZV9wYWdlGAUgASgIGiYKCENhdGVnb3J5EgoKAmlkGAEgASgJEg4KBndlaWdodBgCIAEoBUI2CiVvcmcuY2hyb21pdW0uY29tcG9uZW50cy5zeW5jLnByb3RvY29sSANQAVoJLi9zeW5jX3Bi", [file_sync_enums]);
+/**
+ * Describes the message sync_pb.HistorySpecifics.
+ * Use `create(HistorySpecificsSchema)` to create a new message.
+ */
+export const HistorySpecificsSchema = /*@__PURE__*/ messageDesc(file_history_specifics, 0);
+/**
+ * Describes the message sync_pb.HistorySpecifics.RedirectEntry.
+ * Use `create(HistorySpecifics_RedirectEntrySchema)` to create a new message.
+ */
+export const HistorySpecifics_RedirectEntrySchema = /*@__PURE__*/ messageDesc(file_history_specifics, 0, 0);
+/**
+ * Describes the message sync_pb.HistorySpecifics.PageTransition.
+ * Use `create(HistorySpecifics_PageTransitionSchema)` to create a new message.
+ */
+export const HistorySpecifics_PageTransitionSchema = /*@__PURE__*/ messageDesc(file_history_specifics, 0, 1);
+/**
+ * Describes the message sync_pb.HistorySpecifics.Category.
+ * Use `create(HistorySpecifics_CategorySchema)` to create a new message.
+ */
+export const HistorySpecifics_CategorySchema = /*@__PURE__*/ messageDesc(file_history_specifics, 0, 2);
+//# sourceMappingURL=history_specifics_pb.js.map
