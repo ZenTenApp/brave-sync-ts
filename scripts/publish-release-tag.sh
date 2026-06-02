@@ -11,8 +11,9 @@ if [[ ! -d dist ]]; then
   exit 1
 fi
 
-export GIT_INDEX_FILE
 GIT_INDEX_FILE="$(mktemp)"
+rm -f "$GIT_INDEX_FILE"
+export GIT_INDEX_FILE
 trap 'rm -f "$GIT_INDEX_FILE"' EXIT
 
 export GIT_AUTHOR_NAME="${GIT_AUTHOR_NAME:-github-actions[bot]}"
