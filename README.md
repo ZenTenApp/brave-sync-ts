@@ -18,7 +18,7 @@ npm run build
 
 ### Using in other ZenTenApp projects
 
-Private consumers install from Git over SSH with a **semver tag** (prebuilt `dist/` on the tag). See [Distribution and release](docs/DISTRIBUTION_AND_RELEASE.md) for semantic-release, consumer `package.json` pins, and `ignore-scripts` setup.
+Private consumers install from Git over SSH with a **`v*` semver tag** (that tag points at `package.json` + prebuilt `dist/`; `main` has no `dist/`). See [Distribution and release](docs/DISTRIBUTION_AND_RELEASE.md).
 
 ## Local development and testing
 

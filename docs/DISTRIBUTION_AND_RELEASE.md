@@ -2,61 +2,10 @@
 
 ## Overview
 
-`brave-sync-ts` is a **private** library installed via **Git + SSH**. Consumers pin a **semver tag** on the `dist` branch (prebuilt `dist/` at that commit).
+`brave-sync-ts` is a **private** library installed via **Git + SSH**. Consumers pin a **semver tag**:
 
 ```json
-"brave-sync-ts": "github:ZenTenApp/brave-sync-ts#v0.1.0"
-```
-
-`main` is source-only. No `prepare` script — use `ignore-scripts=true` in consumers.
-
-Previously, a bare `github:ZenTenApp/brave-sync-ts` dependency cloned `main`, which has no committed `dist/`, so npm had to run `prepare` (proto + TypeScript build) on every install. That forced consumers to turn off `ignore-scripts`, added install-time supply-chain risk, and gave no stable version to pin in `package.json` or lockfiles. Releases fix that: CI builds once, commits artifacts to `dist`, and tags `vX.Y.Z` so installs are reproducible, script-free, and safe to consume with `ignore-scripts=true`.
-
----
-
-## Workflows
-
-
-| Workflow | File                                                                | When                                                         |
-| -------- | ------------------------------------------------------------------- | ------------------------------------------------------------ |
-| CI       | `[.github/workflows/ci.yml](../.github/workflows/ci.yml)`           | PRs and pushes to `main` — build + test                      |
-| Release  | `[.github/workflows/release.yml](../.github/workflows/release.yml)` | Push to `main` — publish `dist`, then `npx semantic-release` |
-
-
-Config: `[.releaserc.json](../.releaserc.json)` (same plugin style as vault-cleanup, without binary assets).
-
----
-
-## How a release happens
-
-1. Land commits on `main` using [Conventional Commits](https://www.conventionalcommits.org/):
-  - `fix:` → patch
-  - `feat:` → minor
-  - `feat!:` or `BREAKING CHANGE:` in body → major
-2. **Release** workflow runs on push:
-  - Builds on `main`, then runs **semantic-release** on `main` (before `publish-dist.sh`, which checks out `dist` only)
-  - If a release is warranted:
-    - Updates `CHANGELOG.md` and `package.json` on `main`
-    - Rebuilds (`prepareCmd` in `.releaserc.json`)
-    - Publishes `dist` and creates **GitHub Release** `vX.Y.Z` on `origin/dist` (`scripts/semantic-release-publish-dist.sh`)
-    - Pushes `chore(release): X.Y.Z [skip ci]` to `main`
-  - Finally syncs `main` and updates the **`dist`** branch (`scripts/publish-dist.sh`)
-3. Consumers bump `#vX.Y.Z`.
-
-If commits since the last release are only `chore:` / `docs:` / `ci:`, semantic-release **skips** a new version; `dist` still updates for latest `main`.
-
----
-
-## Why tags target `dist`, not `main`
-
-Git installs need `dist/index.js` at the tagged commit. vault-cleanup tags `main` and ships **release assets** (binaries). This library ships **source tree at tag** with `dist/` inside it, so the tag must point at the `dist` branch commit. semantic-release’s default `@semantic-release/github` tag-on-`main` is replaced by `@semantic-release/exec` + `gh release create --target origin/dist`.
-
----
-
-## Consumer setup
-
-```json
-"brave-sync-ts": "github:ZenTenApp/brave-sync-ts#v0.1.0"
+"brave-sync-ts": "github:ZenTenApp/brave-sync-ts#v1.0.0"
 ```
 
 ```ini
@@ -64,7 +13,41 @@ Git installs need `dist/index.js` at the tagged commit. vault-cleanup tags `main
 ignore-scripts=true
 ```
 
-Upgrade: change `#vX.Y.Z`, `npm install`, commit lockfile, test.
+- **`main`** — source only (`dist/` is gitignored; never committed here).
+- **`vX.Y.Z`** — installable snapshot: `package.json` + built `dist/` at a tag (no `dist` branch).
+
+---
+
+## Workflows
+
+| Workflow | File | When |
+| -------- | ---- | ---- |
+| CI | [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | PRs and pushes to `main` |
+| Release | [`.github/workflows/release.yml`](../.github/workflows/release.yml) | Push to `main` → `npx semantic-release` |
+
+Config: [`.releaserc.json`](../.releaserc.json). Install tags: [`scripts/publish-release-tag.sh`](../scripts/publish-release-tag.sh).
+
+---
+
+## What happens on release
+
+1. Conventional commits on `main` (`fix:` patch, `feat:` minor, breaking → major).
+2. semantic-release updates `CHANGELOG.md` / `package.json` on `main`, builds `dist/` in CI (not committed).
+3. Pushes `chore(release): X.Y.Z [skip ci]` and tags **`vX.Y.Z`** on that commit.
+4. `publish-release-tag.sh` retargets **`vX.Y.Z`** to an install commit (`package.json` + `dist/`) and updates the GitHub Release.
+
+CI bootstraps the previous `v*` tag onto the last `chore(release)` on `main` (local only) so semantic-release can compute the next version.
+
+---
+
+## Version bumps
+
+| Commit | Release |
+| ------ | ------- |
+| `fix:` | patch |
+| `feat:` | minor |
+| `feat!:` or `BREAKING CHANGE:` | major |
+| `chore:` / `docs:` / `ci:` only | no release |
 
 ---
 
@@ -76,13 +59,10 @@ npm run build:proto && npm run build
 npm test
 ```
 
-Dry-run release tooling (optional): `npm run release -- --dry-run` with a clean tree and `GITHUB_TOKEN` set.
-
 ---
 
 ## Pitfalls
 
-1. **Pinning `main`** — no guaranteed `dist/`; pin semver tags only.
-2. **Non-conventional commits** — no automatic release until a `feat:` / `fix:` / breaking commit lands.
-3. **chore(release) pushes** — use `[skip ci]` in the release commit message; CI may still run on that push but semantic-release should not release again.
-
+1. **Pin `v*` tags**, not `main` — `main` has no `dist/`.
+2. **Conventional commits** — required for automatic semver.
+3. **Cleaning old tags** — delete any `main-v*` tags on GitHub; only `v*` should remain.

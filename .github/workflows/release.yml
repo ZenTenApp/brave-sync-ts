@@ -6,21 +6,14 @@ on:
 
 permissions:
   contents: write
-  issues: write
-  pull-requests: write
 
 jobs:
   release:
-    name: Semantic Release
     runs-on: ubuntu-latest
-    concurrency:
-      group: dist-branch
-      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -28,20 +21,11 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run build:proto
-      - run: npm run build
 
-      # Must run on main (full tree + .releaserc.json). publish-dist checks out dist only.
+      - name: Bootstrap release tags for semantic-release
+        run: bash scripts/bootstrap-release-tags.sh
+
       - name: Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npx semantic-release
-
-      # When semantic-release skips, publish dist. When it releases, publishCmd already ran;
-      # this syncs dist to latest main (including chore(release) commits).
-      - name: Publish to dist branch
-        run: |
-          git fetch origin main
-          git checkout -B main origin/main
-          npm run build:proto && npm run build
-          bash scripts/publish-dist.sh
