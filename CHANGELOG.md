@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/ZenTenApp/brave-sync-ts/compare/v1.0.1...v1.0.2) (2026-06-02)
+
+
+### Bug Fixes
+
+* correct temp index in publish-release-tag ([7620339](https://github.com/ZenTenApp/brave-sync-ts/commit/76203393bb57f000d3d517524793c9bb3f642da4))
+
 ## [1.0.1](https://github.com/ZenTenApp/brave-sync-ts/compare/v1.0.0...v1.0.1) (2026-06-02)
 
 
