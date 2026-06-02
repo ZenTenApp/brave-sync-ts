@@ -84,5 +84,5 @@ Dry-run release tooling (optional): `npm run release -- --dry-run` with a clean 
 
 1. **Pinning `main`** — no guaranteed `dist/`; pin semver tags only.
 2. **Non-conventional commits** — no automatic release until a `feat:` / `fix:` / breaking commit lands.
-3. `**chore(release)` pushes** — use `[skip ci]` in the release commit message; CI may still run on that push but semantic-release should not release again.
+3. **chore(release) pushes** — use `[skip ci]` in the release commit message; CI may still run on that push but semantic-release should not release again.
 
