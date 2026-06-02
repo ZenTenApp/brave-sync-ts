@@ -801,6 +801,7 @@ export class BraveSyncClient {
   private readonly seedPhrase: string;
   private readonly serverUrl: string;
   private readonly serviceKey: string;
+  private readonly networkAdapter?: NetworkAdapter;
 
   private publicKey: Uint8Array | null = null;
   private privateKey: Uint8Array | null = null;
@@ -818,10 +819,12 @@ export class BraveSyncClient {
     seedPhrase: string;
     serverUrl?: string;
     serviceKey?: string;
+    networkAdapter?: NetworkAdapter;
   }) {
     this.seedPhrase = config.seedPhrase;
     this.serverUrl = config.serverUrl ?? BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL;
     this.serviceKey = config.serviceKey ?? BRAVE_SYNC_CONSTANTS.SERVICE_KEY;
+    this.networkAdapter = config.networkAdapter;
   }
 
   /**
@@ -1113,6 +1116,7 @@ export class BraveSyncClient {
       serviceKey: this.serviceKey,
       clientId: getClientId(this.publicKey),
       authToken: this.authToken,
+      networkAdapter: this.networkAdapter,
     };
   }
 }
