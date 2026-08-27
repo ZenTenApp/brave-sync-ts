@@ -12,6 +12,7 @@ import {
   readPasswords,
   updatePassword,
   deletePassword,
+  pushBookmark,
   readBookmarks,
   readAuthenticatorEntries,
 } from "./index.js";
@@ -276,6 +277,47 @@ program
       } else {
         console.log(`  Deleted: ${options.url} / ${options.username}`);
       }
+    } else {
+      console.error("Failed!");
+      console.error(`  Error: ${result.error}`);
+      process.exit(1);
+    }
+  });
+
+// ============================================================================
+// PUSH BOOKMARK (CREATE)
+// ============================================================================
+program
+  .command("push-bookmark")
+  .description("Push a new bookmark to Brave Sync")
+  .requiredOption("--seed <phrase>", "25-word seed phrase (or 'env' to use BRAVE_SYNC_SEED)")
+  .requiredOption("--url <url>", "Bookmark URL")
+  .requiredOption("--title <title>", "Bookmark title")
+  .option("--parent-guid <guid>", "Parent folder GUID (default: Bookmark Bar)")
+  .option("--server <url>", "Sync server URL", "https://sync-v2.brave.com/v2")
+  .option("--service-key <key>", "Brave service key")
+  .action(async (options) => {
+    const seedPhrase = getSeedPhrase(options);
+
+    console.log("=".repeat(60));
+    console.log("Pushing bookmark to Brave Sync");
+    console.log("=".repeat(60));
+    console.log();
+
+    const result = await pushBookmark({
+      seedPhrase,
+      url: options.url,
+      title: options.title,
+      parentGuid: options.parentGuid,
+      serverUrl: options.server,
+      serviceKey: options.serviceKey,
+    });
+
+    if (result.success) {
+      console.log("Success!");
+      console.log(`  Title: ${options.title}`);
+      console.log(`  URL: ${options.url}`);
+      console.log(`  GUID: ${result.guid}`);
     } else {
       console.error("Failed!");
       console.error(`  Error: ${result.error}`);

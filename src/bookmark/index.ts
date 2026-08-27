@@ -7,3 +7,8 @@ export {
   type BookmarkEntry,
   type ReadBookmarksResult,
 } from "./read.js";
+
+export {
+  createBookmarkEntity,
+  type CreateBookmarkEntityOptions,
+} from "./write.js";

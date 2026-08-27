@@ -63,8 +63,10 @@ export {
 // Re-export bookmark utilities
 export {
   fetchBookmarks,
+  createBookmarkEntity,
   type BookmarkEntry,
   type ReadBookmarksResult,
+  type CreateBookmarkEntityOptions,
 } from "./bookmark/index.js";
 
 // Re-export authenticator utilities
@@ -109,7 +111,11 @@ import {
 // Re-export PasswordNote type
 export type { PasswordNote } from "./password/index.js";
 import { fetchNigoriSettings, commitEntities, initializeNigori, type SyncClientOptions, type NetworkAdapter } from "./sync/index.js";
-import { fetchBookmarks, type ReadBookmarksResult } from "./bookmark/index.js";
+import {
+  fetchBookmarks,
+  createBookmarkEntity,
+  type ReadBookmarksResult,
+} from "./bookmark/index.js";
 import { fetchAuthenticatorEntries, type ReadAuthenticatorResult } from "./authenticator/index.js";
 
 /**
@@ -426,6 +432,105 @@ export async function readBookmarks(options: ReadSyncOptions): Promise<ReadBookm
       success: false,
       bookmarks: [],
       decryptionFailures: 0,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+/**
+ * Options for pushing a bookmark to Brave Sync.
+ */
+export interface PushBookmarkOptions {
+  /** 24 or 25-word BIP39 seed phrase */
+  seedPhrase: string;
+  /** The bookmark URL */
+  url: string;
+  /** The bookmark title */
+  title: string;
+  /** Parent folder GUID (defaults to the Bookmark Bar) */
+  parentGuid?: string;
+  /** Sync server URL (defaults to Brave production server) */
+  serverUrl?: string;
+  /** Brave service key (defaults to production key) */
+  serviceKey?: string;
+  /** Optional network adapter for DNS/HTTP fallback (e.g. React Native) */
+  networkAdapter?: NetworkAdapter;
+}
+
+/**
+ * Result of pushing a bookmark to Brave Sync.
+ */
+export interface PushBookmarkResult {
+  /** Whether the operation succeeded */
+  success: boolean;
+  /** Entity ID / GUID assigned to the bookmark */
+  guid?: string;
+  /** Error message if the operation failed */
+  error?: string;
+}
+
+/**
+ * Push a bookmark to the Brave sync server.
+ *
+ * Creates a bookmark entry under the Bookmark Bar (or a given parent folder),
+ * Nigori-encrypted and committed to the server.
+ *
+ * @param options - Bookmark push options
+ * @returns Result indicating success or failure
+ */
+export async function pushBookmark(options: PushBookmarkOptions): Promise<PushBookmarkResult> {
+  const {
+    seedPhrase,
+    url,
+    title,
+    parentGuid,
+    serverUrl = BRAVE_SYNC_CONSTANTS.DEFAULT_SERVER_URL,
+    serviceKey = BRAVE_SYNC_CONSTANTS.SERVICE_KEY,
+    networkAdapter,
+  } = options;
+
+  try {
+    const seed = seedPhraseToBytes(seedPhrase);
+    const { publicKey, privateKey } = await deriveEd25519Keypair(seed);
+    const clientId = getClientId(publicKey);
+    const authToken = await generateAuthToken(privateKey, publicKey);
+
+    const syncOptions: SyncClientOptions = {
+      serverUrl,
+      serviceKey,
+      clientId,
+      authToken,
+      networkAdapter,
+    };
+
+    // Fetch Nigori settings; initialise the chain if it doesn't exist yet.
+    let nigoriSettings = await fetchNigoriSettings(syncOptions);
+    if (!nigoriSettings) {
+      nigoriSettings = await initializeNigori(syncOptions, seedPhrase);
+    }
+
+    const { encryptionKey, macKey } = deriveNigoriKeys(seedPhrase, nigoriSettings.keyDerivationMethod, nigoriSettings.salt);
+
+    const entity = createBookmarkEntity({
+      url,
+      title,
+      parentGuid,
+      encryptionKey,
+      macKey,
+    });
+
+    const response = await commitEntities(syncOptions, [entity]);
+
+    if (response.errorCode === 0) {
+      return { success: true, guid: entity.idString };
+    }
+    return {
+      success: false,
+      error: `Server error code: ${response.errorCode}`,
+    };
+  } catch (error) {
+    return {
+      success: false,
       error: error instanceof Error ? error.message : String(error),
     };
   }
@@ -924,6 +1029,45 @@ export class BraveSyncClient {
     this.ensureConnected();
 
     return fetchBookmarks(this.getSyncOptions(), this.encryptionKey!, this.macKey!);
+  }
+
+  /**
+   * Push a bookmark to the sync server.
+   *
+   * @param options - Bookmark options (url, title)
+   * @returns Result indicating success or failure
+   */
+  async pushBookmark(options: {
+    url: string;
+    title: string;
+    parentGuid?: string;
+  }): Promise<PushBookmarkResult> {
+    this.ensureConnected();
+
+    try {
+      const entity = createBookmarkEntity({
+        url: options.url,
+        title: options.title,
+        parentGuid: options.parentGuid,
+        encryptionKey: this.encryptionKey!,
+        macKey: this.macKey!,
+      });
+
+      const response = await commitEntities(this.getSyncOptions(), [entity]);
+
+      if (response.errorCode === 0) {
+        return { success: true, guid: entity.idString };
+      }
+      return {
+        success: false,
+        error: `Server error code: ${response.errorCode}`,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
   }
 
   /**
