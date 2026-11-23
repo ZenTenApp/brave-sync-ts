@@ -310,9 +310,10 @@ export function getCommitError(
       case CommitResponse_ResponseType.SUCCESS:
         continue;
       case CommitResponse_ResponseType.OVER_QUOTA:
-        // The server's own message can report an internal adjusted count,
-        // so it is not shown here.
-        return "Storage limit reached: the server will not accept more items for this sync chain";
+        // Servers explain quota refusals themselves (e.g. litesync: "Password
+        // limit reached: this sync chain has 120 of 120 allowed passwords").
+        return entry.errorMessage ||
+          "Storage limit reached: the server will not accept more items for this sync chain";
       default: {
         const type = CommitResponse_ResponseType[entry.responseType] ?? String(entry.responseType);
         return entry.errorMessage

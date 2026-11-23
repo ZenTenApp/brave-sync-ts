@@ -36,10 +36,17 @@ describe("getCommitError", () => {
   });
 
   it("rejects OVER_QUOTA even when the message-level code is SUCCESS", () => {
-    const err = getCommitError(responseWith(0, CommitResponse_ResponseType.OVER_QUOTA));
-    expect(err).toMatch(/^Storage limit reached/);
-    // The server's message may carry an internal adjusted count; keep it out.
-    expect(err).not.toContain("server detail");
+    expect(getCommitError(responseWith(0, CommitResponse_ResponseType.OVER_QUOTA))).toBe(
+      "server detail"
+    );
+  });
+
+  it("falls back to a generic OVER_QUOTA message when the server sends none", () => {
+    const rsp = responseWith(0, CommitResponse_ResponseType.OVER_QUOTA);
+    rsp.commit!.entryresponse[0].errorMessage = "";
+    expect(getCommitError(rsp)).toBe(
+      "Storage limit reached: the server will not accept more items for this sync chain"
+    );
   });
 
   it("rejects other per-entry failures with the type and server message", () => {
