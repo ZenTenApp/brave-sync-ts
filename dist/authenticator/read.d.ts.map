@@ -1,0 +1,1 @@
+{"version":3,"file":"read.d.ts","sourceRoot":"","sources":["../../src/authenticator/read.ts"],"names":[],"mappings":"AAAA;;;;;;;;;GASG;AASH,OAAO,EAAmB,KAAK,iBAAiB,EAAE,MAAM,mBAAmB,CAAC;AAG5E,OAAO,KAAK,EAAY,uBAAuB,EAAE,MAAM,YAAY,CAAC;AAcpE;;;;;;;GAOG;AACH,wBAAsB,yBAAyB,CAC7C,OAAO,EAAE,iBAAiB,EAC1B,aAAa,EAAE,UAAU,EACzB,MAAM,EAAE,UAAU,GACjB,OAAO,CAAC,uBAAuB,CAAC,CAoGlC"}
