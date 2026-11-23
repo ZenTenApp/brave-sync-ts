@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Move vX.Y.Z from the main release commit to an install commit (package.json + dist/).
-# semantic-release tags main first; this script retargets the same tag for consumers.
+# Publish vX.Y.Z on an install commit (package.json + dist/) for consumers.
+# semantic-release tags main separately as release-vX.Y.Z, so the two never collide.
 set -euo pipefail
 
 VERSION="${1:?version required}"
