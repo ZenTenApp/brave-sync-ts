@@ -1,3 +1,12 @@
+## [1.0.3](https://github.com/ZenTenApp/brave-sync-ts/compare/release-v1.0.2...release-v1.0.3) (2026-11-23)
+
+
+### Bug Fixes
+
+* check per-entry commit results ([f31f9a7](https://github.com/ZenTenApp/brave-sync-ts/commit/f31f9a74ca43bcc06f7f8ce99d806174f0def834))
+* show the server's OVER_QUOTA message ([f60b6b8](https://github.com/ZenTenApp/brave-sync-ts/commit/f60b6b8ffd5f73cee0168a6e1a0230938bb594c2))
+* use release-v* tags for semantic-release ([b611e69](https://github.com/ZenTenApp/brave-sync-ts/commit/b611e695d83bed4603149b1280345aac80e6c811))
+
 ## [1.0.2](https://github.com/ZenTenApp/brave-sync-ts/compare/v1.0.1...v1.0.2) (2026-06-02)
 
 
