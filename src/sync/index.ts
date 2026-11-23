@@ -6,6 +6,7 @@ export {
   sendSyncRequest,
   fetchNigoriSettings,
   commitEntities,
+  getCommitError,
   type SyncClientOptions,
 } from "./client.js";
 

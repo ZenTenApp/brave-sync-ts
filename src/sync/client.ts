@@ -37,6 +37,7 @@ import {
   type ClientToServerResponse,
   type SyncEntity,
 } from "../proto/index.js";
+import { CommitResponse_ResponseType } from "../proto/generated/sync_pb.js";
 import { BRAVE_SYNC_CONSTANTS, KEY_DERIVATION_PBKDF2, KEY_DERIVATION_SCRYPT, type NigoriSettings } from "../types.js";
 import type { NetworkAdapter } from "./adapter.js";
 import { httpsPostWithIp, isDnsError, resolveViaNodeDns } from "./dns-fallback.js";
@@ -281,6 +282,47 @@ export async function commitEntities(
   });
 
   return sendSyncRequest(options, message);
+}
+
+/**
+ * Return an error message if a commit failed, or null if every entry succeeded.
+ *
+ * A commit reports its result at two levels: the message-level `errorCode`
+ * and a per-entry `responseType`. Servers keep `errorCode` at SUCCESS when
+ * they refuse individual entries (e.g. OVER_QUOTA, CONFLICT), so both must be
+ * checked.
+ */
+export function getCommitError(
+  response: ClientToServerResponse,
+  expectedEntries = 1
+): string | null {
+  if (response.errorCode !== 0) {
+    return `Server error code: ${response.errorCode}`;
+  }
+
+  const entries = response.commit?.entryresponse ?? [];
+  if (entries.length < expectedEntries) {
+    return `Commit response missing entry results (got ${entries.length}, expected ${expectedEntries})`;
+  }
+
+  for (const entry of entries) {
+    switch (entry.responseType) {
+      case CommitResponse_ResponseType.SUCCESS:
+        continue;
+      case CommitResponse_ResponseType.OVER_QUOTA:
+        // The server's own message can report an internal adjusted count,
+        // so it is not shown here.
+        return "Storage limit reached: the server will not accept more items for this sync chain";
+      default: {
+        const type = CommitResponse_ResponseType[entry.responseType] ?? String(entry.responseType);
+        return entry.errorMessage
+          ? `Commit rejected (${type}): ${entry.errorMessage}`
+          : `Commit rejected (${type})`;
+      }
+    }
+  }
+
+  return null;
 }
 
 // ---------------------------------------------------------------------------

@@ -79,6 +79,7 @@ export {
   sendSyncRequest,
   fetchNigoriSettings,
   commitEntities,
+  getCommitError,
   initializeNigori,
   createNigoriSyncEntity,
   createEncryptionKeybag,
@@ -108,7 +109,7 @@ import {
 
 // Re-export PasswordNote type
 export type { PasswordNote } from "./password/index.js";
-import { fetchNigoriSettings, commitEntities, initializeNigori, type SyncClientOptions, type NetworkAdapter } from "./sync/index.js";
+import { fetchNigoriSettings, commitEntities, getCommitError, initializeNigori, type SyncClientOptions, type NetworkAdapter } from "./sync/index.js";
 import { fetchBookmarks, type ReadBookmarksResult } from "./bookmark/index.js";
 import { fetchAuthenticatorEntries, type ReadAuthenticatorResult } from "./authenticator/index.js";
 
@@ -268,18 +269,11 @@ export async function pushPassword(options: PushPasswordOptions): Promise<PushPa
     // Step 8: Commit to server
     const response = await commitEntities(syncOptions, [entity]);
 
-    // Check response
-    if (response.errorCode === 0) {
-      return {
-        success: true,
-        entityId: entity.idString,
-      };
-    } else {
-      return {
-        success: false,
-        error: `Server error code: ${response.errorCode}`,
-      };
+    const commitError = getCommitError(response);
+    if (commitError) {
+      return { success: false, error: commitError };
     }
+    return { success: true, entityId: entity.idString };
   } catch (error) {
     return {
       success: false,
@@ -627,15 +621,11 @@ export async function updatePassword(options: UpdatePasswordOptions): Promise<Mo
     // Step 8: Commit to server
     const response = await commitEntities(syncOptions, [entity]);
 
-    // Check response
-    if (response.errorCode === 0) {
-      return { success: true };
-    } else {
-      return {
-        success: false,
-        error: `Server error code: ${response.errorCode}`,
-      };
+    const commitError = getCommitError(response);
+    if (commitError) {
+      return { success: false, error: commitError };
     }
+    return { success: true };
   } catch (error) {
     return {
       success: false,
@@ -764,15 +754,11 @@ export async function deletePassword(options: DeletePasswordOptions): Promise<Mo
     // Step 9: Commit to server
     const response = await commitEntities(syncOptions, [entity]);
 
-    // Check response
-    if (response.errorCode === 0) {
-      return { success: true };
-    } else {
-      return {
-        success: false,
-        error: `Server error code: ${response.errorCode}`,
-      };
+    const commitError = getCommitError(response);
+    if (commitError) {
+      return { success: false, error: commitError };
     }
+    return { success: true };
   } catch (error) {
     return {
       success: false,
@@ -885,17 +871,11 @@ export class BraveSyncClient {
 
       const response = await commitEntities(this.getSyncOptions(), [entity]);
 
-      if (response.errorCode === 0) {
-        return {
-          success: true,
-          entityId: entity.idString,
-        };
-      } else {
-        return {
-          success: false,
-          error: `Server error code: ${response.errorCode}`,
-        };
+      const commitError = getCommitError(response);
+      if (commitError) {
+        return { success: false, error: commitError };
       }
+      return { success: true, entityId: entity.idString };
     } catch (error) {
       return {
         success: false,
@@ -994,14 +974,11 @@ export class BraveSyncClient {
 
       const response = await commitEntities(this.getSyncOptions(), [entity]);
 
-      if (response.errorCode === 0) {
-        return { success: true };
-      } else {
-        return {
-          success: false,
-          error: `Server error code: ${response.errorCode}`,
-        };
+      const commitError = getCommitError(response);
+      if (commitError) {
+        return { success: false, error: commitError };
       }
+      return { success: true };
     } catch (error) {
       return {
         success: false,
@@ -1063,14 +1040,11 @@ export class BraveSyncClient {
 
       const response = await commitEntities(this.getSyncOptions(), [entity]);
 
-      if (response.errorCode === 0) {
-        return { success: true };
-      } else {
-        return {
-          success: false,
-          error: `Server error code: ${response.errorCode}`,
-        };
+      const commitError = getCommitError(response);
+      if (commitError) {
+        return { success: false, error: commitError };
       }
+      return { success: true };
     } catch (error) {
       return {
         success: false,
