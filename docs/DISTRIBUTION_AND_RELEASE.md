@@ -33,10 +33,10 @@ Config: [`.releaserc.json`](../.releaserc.json). Install tags: [`scripts/publish
 
 1. Conventional commits on `main` (`fix:` patch, `feat:` minor, breaking → major).
 2. semantic-release updates `CHANGELOG.md` / `package.json` on `main`, builds `dist/` in CI (not committed).
-3. Pushes `chore(release): X.Y.Z [skip ci]` and tags **`vX.Y.Z`** on that commit.
-4. `publish-release-tag.sh` retargets **`vX.Y.Z`** to an install commit (`package.json` + `dist/`) and updates the GitHub Release.
+3. Pushes `chore(release): X.Y.Z [skip ci]` and tags **`release-vX.Y.Z`** on that commit (semantic-release's own tag).
+4. `publish-release-tag.sh` creates **`vX.Y.Z`** on an install commit (`package.json` + `dist/`) and updates the GitHub Release.
 
-CI bootstraps the previous `v*` tag onto the last `chore(release)` on `main` (local only) so semantic-release can compute the next version.
+CI bootstraps the previous `release-v*` tag onto the last `chore(release)` on `main` (local only) so semantic-release can compute the next version.
 
 ---
 
